@@ -23,9 +23,24 @@ class Container(object):
         self.ports = dictionary['ports']
 
     @classmethod
-    def create_container(cls, url, image, command, version, volume=None, network=None):
+    def create_container(cls, url, image, command, name=None, version='1.21', volume=None, network=None):
         cli = Client(base_url=url, version=version)
-        container = cli.create_container(image=image, command=command)
+
+        params = {
+            'image': image,
+            'command': command,
+            'host_config': cli.create_host_config(network_mode=network.name)
+        }
+
+        if not name == None:
+            params['name'] = name
+
+        if not network == None:
+            params['host_config'] = cli.create_host_config(network_mode=network.name)
+
+        print params
+
+        container = cli.create_container(**params)
         cli.start(container=container.get('Id'))
 
         detail = cli.inspect_container(container=container)
