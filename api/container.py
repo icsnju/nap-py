@@ -29,8 +29,7 @@ class Container(object):
         params = {
             'image': image,
             'command': command,
-            'host_config': cli.create_host_config(network_mode=network.name)
-        }
+                 }
 
         if not name == None:
             params['name'] = name
@@ -38,7 +37,7 @@ class Container(object):
         if not network == None:
             params['host_config'] = cli.create_host_config(network_mode=network.name)
 
-        print params
+        # print params
 
         container = cli.create_container(**params)
         cli.start(container=container.get('Id'))
