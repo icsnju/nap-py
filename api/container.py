@@ -55,3 +55,9 @@ class Container(object):
         dic['ports'] = detail['NetworkSettings']['Ports']
 
         return cls(cli, volume, network, dic)
+
+    def stop(timeout=0):
+        self.client.stop(container=self.name, timeout=timeout)
+
+    def remove():
+        self.client.remove_container(container=self.name)

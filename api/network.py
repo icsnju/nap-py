@@ -11,7 +11,7 @@ class Network(object):
 
     @staticmethod
     def create_network(client, name, driver):
-        client.create_network(name, driver=driver)
+        client.create_network(name=name, driver=driver)
 
     @staticmethod
     def get_networks(client):
@@ -25,3 +25,7 @@ class Network(object):
             ans.append(item)
 
         return ans
+
+    @staticmethod
+    def remove_network(client, name):
+        client.remove_network(net_id=name)
