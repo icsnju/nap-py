@@ -2,26 +2,41 @@ from docker import Client
 
 from api.network import Network
 from api.volume import Volume
+from api.exception import NoImage
 
 class Container(object):
     """
     Represents a Docker container
     """
 
-    def __init__(self, client, volume, network, dictionary):
-        self.client = client
+    def __init__(self, client, version, volume, network, dictionary):
+        self.client = Client(base_url=client, version=version)
         self.volume = volume
         self.network = network
 
-        self.ip = dictionary["ip"]
-        self.id = dictionary['id']
-        self.name = dictionary['name']
-        self.status = dictionary['status']
-        self.image = dictionary['image']
-        self.cmd = dictionary['cmd']
-        self.create_time = dictionary['create_time']
-        self.ports = dictionary['ports']
+        self.options = dictionary
 
+        self.ip = None
+        self.id = None
+        self.name = None
+        self.status = None
+        self.image = None
+        self.cmd = None
+        self.create_time = None
+        self.ports = None
+
+    def create(self):
+        params = {}
+
+        if not 'image' in self.options:
+            raise NoImage('Container doesnot contain image')
+
+        params['image'] = self.options['image']
+        self.image = params['image']
+
+        if 'container_name' in self.options:
+            params['name'] = self.options['container_name']
+        
     @classmethod
     def create_container(cls, url, image, command, name=None, version='1.21', volume=None, network=None):
         cli = Client(base_url=url, version=version)
