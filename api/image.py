@@ -1,5 +1,8 @@
 import time
 from docker import Client
+from docker.errors import NotFound
+
+import sys
 
 def format_size(size):
     if size < 1000:
@@ -21,7 +24,7 @@ class Image(object):
         self.cli = client
 
         info = self.get_info(name)
-
+        
         self.tag = info['tag']
         self.size = info['size']
         self.create_time = info['create_time']

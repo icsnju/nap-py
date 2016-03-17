@@ -2,6 +2,8 @@ from docker import Client
 
 from api.network import Network
 from api.volume import Volume
+from api.image import Image
+
 from api.exception import NoImage
 
 class Container(object):
@@ -31,12 +33,76 @@ class Container(object):
         if not 'image' in self.options:
             raise NoImage('Container doesnot contain image')
 
-        params['image'] = self.options['image']
-        self.image = params['image']
+        params['image'] = Image(self.client, self.options['image'])
+        self.image = Image(self.client, params['image'])
+
+        if 'command' in self.options:
+            params['command'] = self.options['command']
+
+        if 'mem_limit' in self.options:
+            params['mem_limit'] = self.options['mem_limit']
+
+        # ports binding need
+        if 'ports' in self.options:
+            params['ports'] = self.options['ports']
+
+        if 'environment' in self.options:
+            params['environment'] = self.options['environment']
+
+        if 'dns' in self.options:
+            params['dns'] = self.options['dns']
+
+        if 'entrypoint' in self.options:
+            params['entrypoint'] = self.options['entrypoint']
+
+        if 'cpu_shares' in self.options:
+            params['cpu_shares'] = self.options['cpu_shares']
 
         if 'container_name' in self.options:
             params['name'] = self.options['container_name']
-        
+
+        if 'working_dir' in self.options:
+            params['working_dir'] = self.options['working_dir']
+
+        if 'domainname' in self.options:
+            params['domainname'] = self.options['domainname']
+
+        if 'mac_address' in self.options:
+            params['mac_address'] = self.options['mac_address']
+
+        if not self.network == None:
+            network_mode = self.network.name
+
+        binds = None
+        if not self.volume.vol == None:
+            binds = self.volume.vol
+
+        privileged = False
+        if 'privileged' in self.options:
+            privileged = self.options[privileged]
+
+        volumes_from = None
+        if 'volumes_from' in self.options:
+            volumes_from = self.options['volumes_from']
+
+        params['host_config'] = self.client.create_host_config(network_mode=network_mode, binds=binds, privileged=privileged, volumes_from=volumes_from)
+
+        container = self.client.create_container(**params)
+
+        self.id = container.get('Id')
+
+    def start(self):
+        self.client.start(container=self.id)
+
+        detail = cli.inspect_container(container=container)
+
+        self.name = detail['Name']
+        self.status = detail['State']['Status']
+        self.command = command
+        self.create_time = detail['Created']
+        self.ip = detail['NetworkSettings']['IPAddress']
+        self.ports = detail['NetworkSettings']['Ports']
+
     @classmethod
     def create_container(cls, url, image, command, name=None, version='1.21', volume=None, network=None):
         cli = Client(base_url=url, version=version)
@@ -71,8 +137,20 @@ class Container(object):
 
         return cls(cli, volume, network, dic)
 
-    def stop(timeout=0):
-        self.client.stop(container=self.name, timeout=timeout)
+    def stop(self):
+		self.client.stop(container=self.name)
 
-    def remove():
-        self.client.remove_container(container=self.name)
+	def pause(self):
+		self.client.pause(container=self.name)
+
+	def unpause(self):
+		self.client.unpause(container=self.name)
+
+	def kill(self):
+		self.client.kill(container=self.name)
+
+	def remove(self):
+		self.client.remove_container(container=self.name)
+
+	def restart(self):
+		self.client.restart(container=self.name)
