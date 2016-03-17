@@ -67,4 +67,10 @@ class Image(object):
 
             rel.append(item)
 
+    @classmethod
+    def destroy_image(cls, url, version, name):
+        cli = Client(base_url=url, version=version)
+
+        cli.remove_image(image=name)
+
         return rel

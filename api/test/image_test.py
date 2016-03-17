@@ -13,3 +13,5 @@ print im.name
 print im.size
 print im.create_time
 print im.tag
+
+Image.destroy_image(url='114.212.87.52:2376', version='1.21', name='test')
