@@ -11,7 +11,7 @@ class Container(object):
     Represents a Docker container
     """
 
-    def __init__(self, client, version, volume, network, dictionary):
+    def __init__(self, client, version, dictionary, volume=None, network=None):
         self.client = Client(base_url=client, version=version)
         self.volume = volume
         self.network = network
@@ -138,19 +138,19 @@ class Container(object):
         return cls(cli, volume, network, dic)
 
     def stop(self):
-		self.client.stop(container=self.name)
+        self.client.stop(container=self.name)
 
-	def pause(self):
-		self.client.pause(container=self.name)
+    def pause(self):
+        self.client.pause(container=self.name)
 
-	def unpause(self):
-		self.client.unpause(container=self.name)
+    def unpause(self):
+        self.client.unpause(container=self.name)
 
-	def kill(self):
-		self.client.kill(container=self.name)
+    def kill(self):
+        self.client.kill(container=self.name)
 
-	def remove(self):
-		self.client.remove_container(container=self.name)
+    def remove(self):
+        self.client.remove_container(container=self.name)
 
-	def restart(self):
-		self.client.restart(container=self.name)
+    def restart(self):
+        self.client.restart(container=self.name)
