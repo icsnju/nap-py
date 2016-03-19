@@ -33,14 +33,17 @@ class Container(object):
         if not 'image' in self.options:
             raise NoImage('Container doesnot contain image')
 
-        params['image'] = Image(self.client, self.options['image'])
+        # params['image'] = Image(self.client, self.options['image'])
+        params['image'] = self.options['image']
         self.image = Image(self.client, params['image'])
 
         if 'command' in self.options:
             params['command'] = self.options['command']
 
+        mem_limit = None
         if 'mem_limit' in self.options:
-            params['mem_limit'] = self.options['mem_limit']
+            # params['mem_limit'] = self.options['mem_limit']
+            mem_limit = self.options['mem_limit']
 
         # ports binding need
         if 'ports' in self.options:
@@ -79,13 +82,13 @@ class Container(object):
 
         privileged = False
         if 'privileged' in self.options:
-            privileged = self.options[privileged]
+            privileged = self.options['privileged']
 
         volumes_from = None
         if 'volumes_from' in self.options:
             volumes_from = self.options['volumes_from']
 
-        params['host_config'] = self.client.create_host_config(network_mode=network_mode, binds=binds, privileged=privileged, volumes_from=volumes_from)
+        params['host_config'] = self.client.create_host_config(network_mode=network_mode, binds=binds, privileged=privileged, volumes_from=volumes_from, mem_limit=mem_limit)
 
         container = self.client.create_container(**params)
 

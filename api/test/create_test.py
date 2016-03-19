@@ -1,5 +1,6 @@
 from api.container import Container
 from api.network import Network
+from api.volume import Volume
 
 from api.exception import NoImage
 
@@ -11,6 +12,28 @@ def create_container_test():
     print container.cmd
     print container.ports
 
+def create_dict_test():
+    url = '114.212.87.52:2376'
+    version = '1.21'
+    volume = None
+    network = None
+
+    dic = {}
+    dic['image'] = 'busybox'
+    dic['container_name'] = 'test'
+    dic['command'] = '/bin/sleep 30'
+    dic['hostname'] = 'testhostname'
+    dic['mem_limit'] = '24m'
+    dic['ports'] = [80, 8000]
+    dic['cpu_shares'] = 3
+
+    volume = Volume(['/home/monkey/fuli:/fuli:rw', '/home/monkey/fire:/fire'])
+    network = Network('test', 'bridge')
+    dic['privileged'] = True
+
+    con = Container(url, version, dic, volume, network)
+    con.create()
+
 def create_noimage():
     url = '114.212.87.52:2376'
     version = '1.21'
@@ -21,10 +44,8 @@ def create_noimage():
     dic['container_name'] = 'test'
 
     con = Container(url, version, dic, volume, network)
-    con.create()
-
 if __name__ == '__main__':
     try:
-        create_noimage()
+        create_dict_test()
     except NoImage as e:
         print e.msg
