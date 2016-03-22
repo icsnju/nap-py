@@ -97,11 +97,16 @@ class Container(object):
     def start(self):
         self.client.start(container=self.id)
 
-        detail = cli.inspect_container(container=container)
+        detail = self.client.inspect_container(container=self.id)
 
         self.name = detail['Name']
         self.status = detail['State']['Status']
+
+        command = ""
+        for item in detail['Config']['Cmd']:
+            command = command + item + " "
         self.command = command
+
         self.create_time = detail['Created']
         self.ip = detail['NetworkSettings']['IPAddress']
         self.ports = detail['NetworkSettings']['Ports']
@@ -141,19 +146,19 @@ class Container(object):
         return cls(cli, volume, network, dic)
 
     def stop(self):
-        self.client.stop(container=self.name)
+        self.client.stop(container=self.id)
 
     def pause(self):
-        self.client.pause(container=self.name)
+        self.client.pause(container=self.id)
 
     def unpause(self):
-        self.client.unpause(container=self.name)
+        self.client.unpause(container=self.id)
 
     def kill(self):
-        self.client.kill(container=self.name)
+        self.client.kill(container=self.id)
 
     def remove(self):
-        self.client.remove_container(container=self.name)
+        self.client.remove_container(container=self.id)
 
     def restart(self):
-        self.client.restart(container=self.name)
+        self.client.restart(container=self.id)
