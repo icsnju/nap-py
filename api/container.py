@@ -11,8 +11,8 @@ class Container(object):
     Represents a Docker container
     """
 
-    def __init__(self, client, version, dictionary, volume=None, network=None):
-        self.client = Client(base_url=client, version=version)
+    def __init__(self, url, version, dictionary, volume=None, network=None):
+        self.client = Client(base_url=url, version=version)
         self.volume = volume
         self.network = network
 
@@ -26,6 +26,45 @@ class Container(object):
         self.cmd = None
         self.create_time = None
         self.ports = None
+
+    @classmethod
+    def get_container(cls, url, version, name):
+        cli = Client(base_url=url, version=version)
+
+        containers = cli.containers(all=True)
+        for item in containers:
+            if '/' + name in item['Names']:
+
+                detail = cli.inspect_container(item['Id'])
+
+                network_name = detail['HostConfig']['NetworkMode']
+                network_detail =  cli.inspect_network(network_name)
+                network_driver = network_detail['Driver']
+
+                network = Network(network_name, network_driver)
+                volume = None
+
+                con = Container(url, version, None, volume, network)
+
+                con.ip = detail['NetworkSettings']['IPAddress']
+                con.id = item['Id']
+                con.name = name
+                con.status = item['Status']
+                con.image = item['Image']
+                con.cmd = item['Command']
+                con.create_time = item['Created']
+                con.ports = item['Ports']
+
+                return con
+
+        return None
+
+    def container_exists(cli, name):
+        containers = cli.containers(all=True)
+        for item in containers:
+            if '/' + name in item['Names']:
+                return true
+        return False
 
     def create(self):
         params = {}
