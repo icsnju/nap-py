@@ -19,9 +19,9 @@ def create_dict_test():
     network = None
 
     dic = {}
-    dic['image'] = 'busybox'
+    dic['image'] = 'training/webapp'
     dic['container_name'] = 'test'
-    dic['command'] = '/bin/sleep 30'
+    # dic['command'] = '/bin/sleep 30'
     dic['hostname'] = 'testhostname'
     dic['mem_limit'] = '24m'
     dic['ports'] = [80, 8000]
@@ -33,6 +33,7 @@ def create_dict_test():
 
     con = Container(url, version, dic, volume, network)
     con.create()
+    con.start()
 
 def create_noimage():
     url = '114.212.87.52:2376'

@@ -88,6 +88,9 @@ class Container(object):
         if 'ports' in self.options:
             params['ports'] = self.options['ports']
 
+        if 'hostname' in self.options:
+            params['hostname'] = self.options['hostname']
+
         if 'environment' in self.options:
             params['environment'] = self.options['environment']
 
@@ -150,39 +153,39 @@ class Container(object):
         self.ip = detail['NetworkSettings']['IPAddress']
         self.ports = detail['NetworkSettings']['Ports']
 
-    @classmethod
-    def create_container(cls, url, image, command, name=None, version='1.21', volume=None, network=None):
-        cli = Client(base_url=url, version=version)
-
-        params = {
-            'image': image,
-            'command': command,
-                 }
-
-        if not name == None:
-            params['name'] = name
-
-        if not network == None:
-            params['host_config'] = cli.create_host_config(network_mode=network.name)
-
-        # print params
-
-        container = cli.create_container(**params)
-        cli.start(container=container.get('Id'))
-
-        detail = cli.inspect_container(container=container)
-
-        dic = {}
-        dic['id'] = detail['Id']
-        dic['name'] = detail['Name']
-        dic['status'] = detail['State']['Status']
-        dic['image'] = image
-        dic['cmd'] = command
-        dic['create_time'] = detail['Created']
-        dic['ip'] = detail['NetworkSettings']['IPAddress']
-        dic['ports'] = detail['NetworkSettings']['Ports']
-
-        return cls(cli, volume, network, dic)
+    # @classmethod
+    # def create_container(cls, url, image, command, name=None, version='1.21', volume=None, network=None):
+    #     cli = Client(base_url=url, version=version)
+    #
+    #     params = {
+    #         'image': image,
+    #         'command': command,
+    #              }
+    #
+    #     if not name == None:
+    #         params['name'] = name
+    #
+    #     if not network == None:
+    #         params['host_config'] = cli.create_host_config(network_mode=network.name)
+    #
+    #     # print params
+    #
+    #     container = cli.create_container(**params)
+    #     cli.start(container=container.get('Id'))
+    #
+    #     detail = cli.inspect_container(container=container)
+    #
+    #     dic = {}
+    #     dic['id'] = detail['Id']
+    #     dic['name'] = detail['Name']
+    #     dic['status'] = detail['State']['Status']
+    #     dic['image'] = image
+    #     dic['cmd'] = command
+    #     dic['create_time'] = detail['Created']
+    #     dic['ip'] = detail['NetworkSettings']['IPAddress']
+    #     dic['ports'] = detail['NetworkSettings']['Ports']
+    #
+    #     return cls(cli, volume, network, dic)
 
     def stop(self):
         self.client.stop(container=self.id)
