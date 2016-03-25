@@ -85,8 +85,12 @@ class Container(object):
             mem_limit = self.options['mem_limit']
 
         # ports binding need
+        port_bindings = None
         if 'ports' in self.options:
             params['ports'] = self.options['ports']
+            port_bindings = {}
+            for item in self.options['ports']:
+                port_bindings[item] = None
 
         if 'hostname' in self.options:
             params['hostname'] = self.options['hostname']
@@ -130,7 +134,8 @@ class Container(object):
         if 'volumes_from' in self.options:
             volumes_from = self.options['volumes_from']
 
-        params['host_config'] = self.client.create_host_config(network_mode=network_mode, binds=binds, privileged=privileged, volumes_from=volumes_from, mem_limit=mem_limit)
+        print port_bindings
+        params['host_config'] = self.client.create_host_config(port_bindings=port_bindings, network_mode=network_mode, binds=binds, privileged=privileged, volumes_from=volumes_from, mem_limit=mem_limit)
 
         container = self.client.create_container(**params)
 
