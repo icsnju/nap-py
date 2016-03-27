@@ -1,22 +1,27 @@
 from docker import Client
 
 from api.network import Network
-from api.volume import Volume
+# from api.volume import Volume
 from api.image import Image
 
 from api.exception import NoImage
+
+#todo 需要指定hostURL才能获取容器对象，需要有容器id/name与hostURL的对应数据，考虑应在上层实现
+#todo 考虑hostURL用client对象代替，如image.py那样？
+
+
 
 class Container(object):
     """
     Represents a Docker container
     """
 
-    def __init__(self, url, version, dictionary, volume=None, network=None):
-        self.client = Client(base_url=url, version=version)
+    def __init__(self, hostURL, version, options, volume=None, network=None):
+        self.client = Client(base_url=hostURL, version=version)
         self.volume = volume
         self.network = network
 
-        self.options = dictionary
+        self.options = options
 
         self.ip = None
         self.id = None
@@ -28,23 +33,22 @@ class Container(object):
         self.ports = None
 
     @classmethod
-    def get_container(cls, url, version, name):
-        cli = Client(base_url=url, version=version)
+    def getContainerByName(cls, hostURL, version, name):
+        cli = Client(base_url=hostURL, version=version)
 
         containers = cli.containers(all=True)
         for item in containers:
             if '/' + name in item['Names']:
-
                 detail = cli.inspect_container(item['Id'])
 
                 network_name = detail['HostConfig']['NetworkMode']
-                network_detail =  cli.inspect_network(network_name)
+                network_detail = cli.inspect_network(network_name)
                 network_driver = network_detail['Driver']
 
                 network = Network(network_name, network_driver)
                 volume = None
 
-                con = Container(url, version, None, volume, network)
+                con = Container(hostURL, version, None, volume, network)
 
                 con.ip = detail['NetworkSettings']['IPAddress']
                 con.id = item['Id']
@@ -59,18 +63,18 @@ class Container(object):
 
         return None
 
-    def container_exists(cli, name):
+    def exists(self, name):
         containers = cli.containers(all=True)
         for item in containers:
             if '/' + name in item['Names']:
-                return true
+                return True
         return False
 
     def create(self):
         params = {}
 
         if not 'image' in self.options:
-            raise NoImage('Container doesnot contain image')
+            raise NoImage('Container does not contain image')
 
         # params['image'] = Image(self.client, self.options['image'])
         params['image'] = self.options['image']
@@ -135,13 +139,16 @@ class Container(object):
             volumes_from = self.options['volumes_from']
 
         print port_bindings
-        params['host_config'] = self.client.create_host_config(port_bindings=port_bindings, network_mode=network_mode, binds=binds, privileged=privileged, volumes_from=volumes_from, mem_limit=mem_limit)
+        params['host_config'] = self.client.create_host_config(port_bindings=port_bindings, network_mode=network_mode,
+                                                               binds=binds, privileged=privileged,
+                                                               volumes_from=volumes_from, mem_limit=mem_limit)
 
         container = self.client.create_container(**params)
 
         self.id = container.get('Id')
 
     def start(self):
+        #todo 是否先检查容器是否已经create了？
         self.client.start(container=self.id)
 
         detail = self.client.inspect_container(container=self.id)
