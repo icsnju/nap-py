@@ -108,3 +108,10 @@
 + cpu_period (int): Microseconds of CPU time that the container can get in a CPU period.
 + group_add (list): List of additional group names and/or IDs that the container process will run as.
 + devices (list): Host device bindings. See host devices for more information.
+
+
+###volume operations   
++ 可以创建卷容器，可以挂载到这个容器上　　
++ 用户如果想制定某一个容器挂载到某一个特殊路径下，在create阶段指定　　
++ 卷容器，不可以指定挂载到某一个路径下，只能是默认路径/var/lib/docker/volume
++ nap使用过程中，可以把特定用户的ｍｆｓ路径作为前缀，每次要挂载路径的时候，指定就好　　
