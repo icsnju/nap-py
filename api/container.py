@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from docker import Client
-
 from api.network import Network
 from api.volume import Volume
 from api.image import Image
+from api.client import Client
 
 from docker.errors import NotFound
 from api.exception import NoImage
@@ -12,15 +11,13 @@ from api.exception import NoImage
 #todo 需要指定hostURL才能获取容器对象，需要有容器id/name与hostURL的对应数据，考虑应在上层实现
 #todo 考虑hostURL用client对象代替，如image.py那样？
 
-
-
 class Container(object):
     """
     Represents a Docker container
     """
 
-    def __init__(self, hostURL, version, options, volume=None, network=None):
-        self.client = Client(base_url=hostURL, version=version)
+    def __init__(self, client, options, volume=None, network=None):
+        self.client = client.client
         self.volume = volume
         self.network = network
 
@@ -36,8 +33,8 @@ class Container(object):
         self.ports = None
 
     @classmethod
-    def getContainerByName(cls, hostURL, version, name):
-        cli = Client(base_url=hostURL, version=version)
+    def getContainerByName(cls, client, name):
+        cli = client.client
 
         containers = cli.containers(all=True)
         for item in containers:
@@ -51,7 +48,7 @@ class Container(object):
                 network = Network(network_name, network_driver)
                 volume = None
 
-                con = Container(hostURL, version, None, volume, network)
+                con = Container(client, None, volume, network)
 
                 con.ip = detail['NetworkSettings']['IPAddress']
                 con.id = item['Id']

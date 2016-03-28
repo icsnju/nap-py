@@ -1,6 +1,7 @@
 from api.container import Container
 from api.volume import Volume
 from api.network import Network
+from api.client import Client
 import time
 
 def create_test():
@@ -8,6 +9,8 @@ def create_test():
     version = '1.21'
     volume = None
     network = None
+
+    client = Client(url, version)
 
     dic = {}
     dic['image'] = 'busybox'
@@ -22,7 +25,7 @@ def create_test():
     network = Network('test', 'bridge')
     dic['privileged'] = True
 
-    con = Container(url, version, dic, volume, network)
+    con = Container(client, dic, volume, network)
     con.create()
     return con
 
