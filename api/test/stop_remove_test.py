@@ -13,9 +13,9 @@ def create_test():
     client = Client(url, version)
 
     dic = {}
-    dic['image'] = 'busybox'
-    dic['container_name'] = 'test'
-    dic['command'] = '/bin/sleep 30'
+    dic['image'] = 'training/webapp'
+    # dic['container_name'] = 'test'
+    # dic['command'] = '/bin/sleep 30'
     dic['hostname'] = 'testhostname'
     dic['mem_limit'] = '24m'
     dic['ports'] = [80, 8000]

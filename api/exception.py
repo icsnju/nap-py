@@ -7,3 +7,13 @@ class NoImage(Exception):
 
     def __str__(self):
         return self.msg
+
+class StatusError(Exception):
+    """
+    Exchange docker errors into nap errors
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg

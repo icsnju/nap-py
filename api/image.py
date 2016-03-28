@@ -24,7 +24,7 @@ class Image(object):
         self.cli = client
 
         info = self.get_info(name)
-        
+
         self.tag = info['tag']
         self.size = info['size']
         self.create_time = info['create_time']

@@ -6,7 +6,9 @@ from api.image import Image
 from api.client import Client
 
 from docker.errors import NotFound
+from docker.errors import APIError
 from api.exception import NoImage
+from api.exception import StatusError
 
 #todo 需要指定hostURL才能获取容器对象，需要有容器id/name与hostURL的对应数据，考虑应在上层实现
 #todo 考虑hostURL用client对象代替，如image.py那样？
@@ -152,7 +154,7 @@ class Container(object):
         try:
             self.client.start(container=self.id)
         except NotFound as e:
-            return 'Container does not create '
+            raise StatusError(e.explanation)
 
         detail = self.client.inspect_container(container=self.id)
         # detail = self.client.inspect_container(container='6c1af3937f77901c9f9e7714de94c4084d87e5e8b6912866e485fd590588f35a')
@@ -220,3 +222,11 @@ class Container(object):
 
     def restart(self):
         self.client.restart(container=self.id)
+
+    def connect_container_to_network(self, net_name):
+        detail = self.client.inspect_network(net_name)
+        net_id = detail['Id']
+        try:
+            self.client.connect_container_to_network(container=self.id, net_id=net_id)
+        except APIError as e:
+            raise StatusError(e.explanation)
