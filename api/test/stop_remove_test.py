@@ -49,13 +49,14 @@ def remove_test(container):
 
 if __name__ == "__main__":
     con = create_test()
+    print con.id
     start_test(con)
 
     time.sleep(5)
 
-    pause_test(con)
-    unpause_test(con)
-    restart_test(con)
-    # stop_test(con)
-    kill_test(con)
-    remove_test(con)
+    # pause_test(con)
+    # unpause_test(con)
+    # restart_test(con)
+    # # stop_test(con)
+    # kill_test(con)
+    # remove_test(con)

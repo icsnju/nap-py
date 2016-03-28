@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
 from docker import Client
 
 from api.network import Network
-# from api.volume import Volume
+from api.volume import Volume
 from api.image import Image
 
+from docker.errors import NotFound
 from api.exception import NoImage
 
 #todo 需要指定hostURL才能获取容器对象，需要有容器id/name与hostURL的对应数据，考虑应在上层实现
@@ -149,9 +152,13 @@ class Container(object):
 
     def start(self):
         #todo 是否先检查容器是否已经create了？
-        self.client.start(container=self.id)
+        try:
+            self.client.start(container=self.id)
+        except NotFound as e:
+            return 'Container does not create '
 
         detail = self.client.inspect_container(container=self.id)
+        # detail = self.client.inspect_container(container='6c1af3937f77901c9f9e7714de94c4084d87e5e8b6912866e485fd590588f35a')
 
         self.name = detail['Name']
         self.status = detail['State']['Status']
